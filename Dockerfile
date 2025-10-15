@@ -11,7 +11,7 @@ RUN apk add --no-cache python3 make g++
 WORKDIR /app
 
 # Copiar archivos de dependencias
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
 # Instalar dependencias (incluyendo devDependencies para build)
 RUN npm ci
