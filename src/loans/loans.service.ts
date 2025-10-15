@@ -10,7 +10,6 @@ import { CreateLoanDto } from './dto/create-loan.dto';
 import { CopiesService } from '../copies/copies.service';
 import { CopyStatus } from '../copies/entities/copy.entity';
 import { ReservationsService } from '../reservations/reservations.service';
-import { ReservationStatus } from '../reservations/entities/reservation.entity';
 
 @Injectable()
 export class LoansService {
@@ -28,9 +27,10 @@ export class LoansService {
     const copy = await this.copiesService.findOne(createLoanDto.copyId);
 
     // Verificar si hay una reserva pendiente para este ejemplar
-    const pendingReservation = await this.reservationsService.findPendingReservationByCopy(
-      createLoanDto.copyId,
-    );
+    const pendingReservation =
+      await this.reservationsService.findPendingReservationByCopy(
+        createLoanDto.copyId,
+      );
 
     if (pendingReservation) {
       // Solo el usuario que reservó puede tomar prestado el libro
@@ -132,7 +132,10 @@ export class LoansService {
   async returnLoan(id: string): Promise<Loan> {
     const loan = await this.findOne(id);
 
-    if (loan.status !== LoanStatus.ACTIVE && loan.status !== LoanStatus.OVERDUE) {
+    if (
+      loan.status !== LoanStatus.ACTIVE &&
+      loan.status !== LoanStatus.OVERDUE
+    ) {
       throw new BadRequestException(
         `Loan cannot be returned. Current status: ${loan.status}`,
       );
@@ -195,7 +198,10 @@ export class LoansService {
   async remove(id: string): Promise<void> {
     const loan = await this.findOne(id);
 
-    if (loan.status === LoanStatus.ACTIVE || loan.status === LoanStatus.OVERDUE) {
+    if (
+      loan.status === LoanStatus.ACTIVE ||
+      loan.status === LoanStatus.OVERDUE
+    ) {
       await this.copiesService.updateStatus(loan.copyId, CopyStatus.AVAILABLE);
     }
 

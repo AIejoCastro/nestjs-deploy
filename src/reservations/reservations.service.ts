@@ -59,7 +59,9 @@ export class ReservationsService {
     });
 
     if (existingReservation) {
-      throw new ConflictException('This copy already has an active reservation');
+      throw new ConflictException(
+        'This copy already has an active reservation',
+      );
     }
 
     // Calcular fechas
@@ -114,7 +116,9 @@ export class ReservationsService {
     });
   }
 
-  async findPendingReservationByCopy(copyId: string): Promise<Reservation | null> {
+  async findPendingReservationByCopy(
+    copyId: string,
+  ): Promise<Reservation | null> {
     return this.reservationsRepository.findOne({
       where: { copyId, status: ReservationStatus.PENDING },
       relations: ['user', 'copy', 'copy.book'],
@@ -149,10 +153,10 @@ export class ReservationsService {
     }
 
     reservation.status = ReservationStatus.FULFILLED;
-    
+
     // El ejemplar pasará a BORROWED cuando se cree el préstamo
     // Por ahora lo dejamos como RESERVED
-    
+
     return this.reservationsRepository.save(reservation);
   }
 
@@ -161,7 +165,9 @@ export class ReservationsService {
 
     // Si se proporciona userId, verificar que sea el propietario
     if (userId && reservation.userId !== userId) {
-      throw new BadRequestException('You can only cancel your own reservations');
+      throw new BadRequestException(
+        'You can only cancel your own reservations',
+      );
     }
 
     if (reservation.status !== ReservationStatus.PENDING) {
@@ -203,9 +209,7 @@ export class ReservationsService {
     }
 
     if (expiredReservations.length > 0) {
-      console.log(
-        `[CRON] Expired ${expiredReservations.length} reservations`,
-      );
+      console.log(`[CRON] Expired ${expiredReservations.length} reservations`);
     }
   }
 
@@ -274,10 +278,15 @@ export class ReservationsService {
     const reservation = await this.findOne(id);
 
     if (userId && reservation.userId !== userId) {
-      throw new BadRequestException('You can only delete your own reservations');
+      throw new BadRequestException(
+        'You can only delete your own reservations',
+      );
     }
-    
-    await this.copiesService.updateStatus(reservation.copyId, CopyStatus.AVAILABLE);
+
+    await this.copiesService.updateStatus(
+      reservation.copyId,
+      CopyStatus.AVAILABLE,
+    );
 
     await this.reservationsRepository.delete(id);
   }

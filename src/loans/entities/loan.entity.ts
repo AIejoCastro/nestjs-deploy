@@ -35,17 +35,36 @@ export class Loan {
   @Column()
   copyId: string;
 
-  @Column({ type: (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) ? 'datetime' : 'timestamp' })
+  @Column({
+    type:
+      process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID
+        ? 'datetime'
+        : 'timestamp',
+  })
   loanDate: Date;
 
-  @Column({ type: (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) ? 'datetime' : 'timestamp' })
+  @Column({
+    type:
+      process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID
+        ? 'datetime'
+        : 'timestamp',
+  })
   dueDate: Date;
 
-  @Column({ type: (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) ? 'datetime' : 'timestamp', nullable: true })
+  @Column({
+    type:
+      process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID
+        ? 'datetime'
+        : 'timestamp',
+    nullable: true,
+  })
   returnDate: Date;
 
   @Column({
-    type: (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) ? 'varchar' : 'enum',
+    type:
+      process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID
+        ? 'varchar'
+        : 'enum',
     enum: LoanStatus,
     default: LoanStatus.ACTIVE,
   })

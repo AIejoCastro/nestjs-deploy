@@ -35,7 +35,10 @@ export class User {
   lastName: string;
 
   @Column({
-    type: (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) ? 'varchar' : 'enum',
+    type:
+      process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID
+        ? 'varchar'
+        : 'enum',
     enum: UserRole,
     default: UserRole.STUDENT,
   })

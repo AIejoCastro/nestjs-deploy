@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksController } from './books.controller';
 import { BooksService } from './books.service';
-import { UserRole } from '../users/entities/user.entity';
 
 describe('BooksController', () => {
   let controller: BooksController;
@@ -67,7 +68,9 @@ describe('BooksController', () => {
     it('calls service.update with id and dto', async () => {
       mockService.update.mockResolvedValue({ id: '1', title: 'Updated' });
       const res = await controller.update('1', { title: 'Updated' } as any);
-      expect(mockService.update).toHaveBeenCalledWith('1', { title: 'Updated' });
+      expect(mockService.update).toHaveBeenCalledWith('1', {
+        title: 'Updated',
+      });
       expect(res).toEqual({ id: '1', title: 'Updated' });
     });
   });

@@ -48,7 +48,7 @@ export class UsersController {
 
   @Get('profile')
   @ApiOperation({ summary: 'Get current user profile' })
-  getProfile(@Request() req) {
+  getProfile(@Request() req: { user: { id: string } }) {
     return this.usersService.findOne(req.user.id);
   }
 
@@ -61,7 +61,10 @@ export class UsersController {
 
   @Patch('profile')
   @ApiOperation({ summary: 'Update current user profile' })
-  updateProfile(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+  updateProfile(
+    @Request() req: { user: { id: string } },
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.usersService.update(req.user.id, updateUserDto);
   }
 

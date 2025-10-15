@@ -29,7 +29,10 @@ export class Copy {
   code: string;
 
   @Column({
-    type: (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) ? 'varchar' : 'enum',
+    type:
+      process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID
+        ? 'varchar'
+        : 'enum',
     enum: CopyStatus,
     default: CopyStatus.AVAILABLE,
   })
@@ -47,10 +50,10 @@ export class Copy {
 
   @OneToMany(() => Reservation, (reservation) => reservation.copy)
   reservations: Reservation[];
-  
+
   @CreateDateColumn()
   createdAt: Date;
-  
+
   @UpdateDateColumn()
   updatedAt: Date;
 }

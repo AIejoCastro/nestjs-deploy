@@ -36,14 +36,27 @@ export class Reservation {
   @Column()
   copyId: string;
 
-  @Column({ type: (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) ? 'datetime' : 'timestamp' })
+  @Column({
+    type:
+      process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID
+        ? 'datetime'
+        : 'timestamp',
+  })
   reservationDate: Date;
 
-  @Column({ type: (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) ? 'datetime' : 'timestamp' })
+  @Column({
+    type:
+      process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID
+        ? 'datetime'
+        : 'timestamp',
+  })
   expirationDate: Date;
 
   @Column({
-    type: (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) ? 'varchar' : 'enum',
+    type:
+      process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID
+        ? 'varchar'
+        : 'enum',
     enum: ReservationStatus,
     default: ReservationStatus.PENDING,
   })

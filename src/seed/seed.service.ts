@@ -15,12 +15,16 @@ export class SeedService {
     private booksRepository: Repository<Book>,
     @InjectRepository(Copy)
     private copiesRepository: Repository<Copy>,
-    private dataSource: DataSource
+    private dataSource: DataSource,
   ) {}
 
   async clearDatabase() {
     try {
-      const currentDbResult = await this.dataSource.query(`SELECT current_database() as db;`);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const currentDbResult = await this.dataSource.query(
+        `SELECT current_database() as db;`,
+      );
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       const currentDb = currentDbResult?.[0]?.db;
 
       if (currentDb !== 'biblio') {
@@ -29,7 +33,7 @@ export class SeedService {
         };
       }
 
-      await this.dataSource.query("SET session_replication_role = replica;");
+      await this.dataSource.query('SET session_replication_role = replica;');
 
       const tables: Array<{ tablename: string }> = await this.dataSource.query(`
         SELECT tablename
@@ -39,34 +43,39 @@ export class SeedService {
 
       for (const { tablename } of tables) {
         if (!tablename) continue;
-        await this.dataSource.query(`TRUNCATE TABLE "${tablename}" RESTART IDENTITY CASCADE;`);
+        await this.dataSource.query(
+          `TRUNCATE TABLE "${tablename}" RESTART IDENTITY CASCADE;`,
+        );
       }
 
       await this.dataSource.query('SET session_replication_role = DEFAULT;');
 
       try {
         await this.usersRepository.clear();
-      } catch (e) {
+      } catch {
+        // Ignore errors if table doesn't exist
       }
       try {
         await this.booksRepository.clear();
-      } catch (e) {
+      } catch {
+        // Ignore errors if table doesn't exist
       }
       try {
         await this.copiesRepository.clear();
-      } catch (e) {
+      } catch {
+        // Ignore errors if table doesn't exist
       }
 
       return { message: 'Todas las tablas fueron limpiadas correctamente.' };
     } catch (error) {
       try {
         await this.dataSource.query('SET session_replication_role = DEFAULT;');
-      } catch (e) {
-        console.error(e);
+      } catch (err) {
+        console.error(err);
       }
       throw error;
     }
-    }
+  }
 
   async seed() {
     // For tests: drop and recreate schema
@@ -74,7 +83,8 @@ export class SeedService {
       try {
         await this.dataSource.dropDatabase();
         await this.dataSource.synchronize();
-      } catch (e) {
+      } catch {
+        // Ignore errors during database reset
       }
     }
 
@@ -115,12 +125,16 @@ export class SeedService {
 
     // Use upsert to avoid unique constraint issues when multiple suites run concurrently
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await this.usersRepository.upsert(usersToCreate as any, ['email']);
-    } catch (e) {
+    } catch {
       // fallback to per-item create if upsert not supported
       for (const u of usersToCreate) {
-        const existing = await this.usersRepository.findOne({ where: { email: u.email } });
+        const existing = await this.usersRepository.findOne({
+          where: { email: u.email },
+        });
         if (!existing) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           const user = this.usersRepository.create(u as any);
           await this.usersRepository.save(user);
         }
@@ -198,9 +212,15 @@ export class SeedService {
     ];
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await this.booksRepository.upsert(books as any, ['isbn']);
-      const allSaved = await this.booksRepository.find({ where: books.map((b) => ({ isbn: b.isbn })) as any });
+
+      const allSaved = await this.booksRepository.find({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        where: books.map((b) => ({ isbn: b.isbn })) as any,
+      });
       // ensure order roughly matches
+
       const savedBooks = allSaved;
       // Create copies based on savedBooks below
       // Create copies
@@ -208,17 +228,29 @@ export class SeedService {
       savedBooks.forEach((book, index) => {
         for (let i = 1; i <= 3; i++) {
           const code = `COPY-${String(index + 1).padStart(3, '0')}-${i}`;
-          copies.push({ code, bookId: book.id, status: CopyStatus.AVAILABLE } as any);
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+          copies.push({
+            code,
+            bookId: book.id,
+            status: CopyStatus.AVAILABLE,
+          } as any);
         }
       });
 
       try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         await this.copiesRepository.upsert(copies as any, ['code']);
-      } catch (e) {
+      } catch {
         for (const c of copies) {
-          const existing = await this.copiesRepository.findOne({ where: { code: c.code } });
+          const existing = await this.copiesRepository.findOne({
+            where: { code: c.code },
+          });
           if (!existing) {
-            const created = this.copiesRepository.create({ code: c.code, bookId: c.bookId, status: CopyStatus.AVAILABLE });
+            const created = this.copiesRepository.create({
+              code: c.code,
+              bookId: c.bookId,
+              status: CopyStatus.AVAILABLE,
+            });
             await this.copiesRepository.save(created);
           }
         }
@@ -248,10 +280,9 @@ export class SeedService {
           copies: copies.length,
         },
       };
-    } catch (e) {
+    } catch {
       // fallback behavior if upsert/find path fails
+      return { message: 'Database seeded (fallback)' };
     }
-    // As fallback, return a generic success (shouldn't reach here normally)
-    return { message: 'Database seeded (fallback)' };
   }
 }

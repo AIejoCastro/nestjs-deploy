@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -60,15 +63,18 @@ describe('CopiesService', () => {
       mockRepository.create.mockReturnValue(mockCopy);
       mockRepository.save.mockResolvedValue(mockCopy);
 
-      const res = await service.create({ code: 'COPY-001', bookId: 'book-1' } as any);
+      const res = await service.create({
+        code: 'COPY-001',
+        bookId: 'book-1',
+      } as any);
       expect(res).toEqual(mockCopy);
     });
 
     it('throws ConflictException when code exists', async () => {
       mockRepository.findOne.mockResolvedValue(mockCopy);
-      await expect(service.create({ code: 'COPY-001', bookId: 'book-1' } as any)).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(
+        service.create({ code: 'COPY-001', bookId: 'book-1' } as any),
+      ).rejects.toThrow(ConflictException);
     });
   });
 
@@ -89,7 +95,9 @@ describe('CopiesService', () => {
 
     it('throws NotFoundException when missing', async () => {
       mockRepository.findOne.mockResolvedValue(null);
-      await expect(service.findOne('missing')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('missing')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -100,16 +108,21 @@ describe('CopiesService', () => {
       mockRepository.findOne.mockResolvedValueOnce(null); // check code uniqueness
       mockRepository.save.mockResolvedValue({ ...mockCopy, code: 'NEW' });
 
-      const res = await service.update('copy-1', { code: 'NEW', bookId: 'book-2' } as any);
+      const res = await service.update('copy-1', {
+        code: 'NEW',
+        bookId: 'book-2',
+      } as any);
       expect(res.code).toBe('NEW');
     });
-
   });
 
   describe('updateStatus', () => {
     it('updates status', async () => {
       mockRepository.findOne.mockResolvedValue(mockCopy);
-      mockRepository.save.mockResolvedValue({ ...mockCopy, status: CopyStatus.BORROWED });
+      mockRepository.save.mockResolvedValue({
+        ...mockCopy,
+        status: CopyStatus.BORROWED,
+      });
 
       const res = await service.updateStatus('copy-1', CopyStatus.BORROWED);
       expect(res.status).toBe(CopyStatus.BORROWED);

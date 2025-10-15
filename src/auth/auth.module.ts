@@ -16,7 +16,7 @@ import { APP_GUARD } from '@nestjs/core';
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         secret: (() => {
           const secret = configService.get<string>('JWT_SECRET');
           if (process.env.NODE_ENV === 'production' && !secret) {

@@ -23,11 +23,11 @@ import { AppService } from './app.service';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const dbConfig = configService.get('database');
+        const dbConfig = configService.get<Record<string, any>>('database');
         if (!dbConfig) {
           throw new Error('Database configuration is missing');
         }
-        return dbConfig;
+        return dbConfig as ReturnType<typeof databaseConfig>;
       },
       inject: [ConfigService],
     }),

@@ -1,5 +1,17 @@
-import { Controller, Post, Body, UseGuards, Request, HttpCode } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  HttpCode,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -43,7 +55,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Generate 2FA secret and QR code' })
   @ApiResponse({ status: 200, description: '2FA secret generated' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async generate2FA(@Request() req) {
+  async generate2FA(@Request() req: { user: { id: string } }) {
     const secret = await this.authService.generate2FASecret(req.user.id);
 
     // Guardar el secret temporalmente en el usuario
@@ -59,7 +71,10 @@ export class AuthController {
   @ApiResponse({ status: 200, description: '2FA enabled successfully' })
   @ApiResponse({ status: 400, description: '2FA secret not generated' })
   @ApiResponse({ status: 401, description: 'Invalid 2FA token' })
-  enable2FA(@Request() req, @Body() enable2FADto: Enable2FADto) {
+  enable2FA(
+    @Request() req: { user: { id: string } },
+    @Body() enable2FADto: Enable2FADto,
+  ) {
     return this.authService.enable2FA(req.user.id, enable2FADto.token);
   }
 
@@ -69,7 +84,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Disable 2FA' })
   @ApiResponse({ status: 200, description: '2FA disabled successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  disable2FA(@Request() req) {
+  disable2FA(@Request() req: { user: { id: string } }) {
     return this.authService.disable2FA(req.user.id);
   }
 

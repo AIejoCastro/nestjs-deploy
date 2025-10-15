@@ -37,7 +37,10 @@ export class CopiesController {
   @ApiOperation({ summary: 'Create a new copy' })
   @ApiResponse({ status: 201, description: 'Copy created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request - validation error' })
-  @ApiResponse({ status: 409, description: 'Copy with this code already exists' })
+  @ApiResponse({
+    status: 409,
+    description: 'Copy with this code already exists',
+  })
   create(@Body() createCopyDto: CreateCopyDto) {
     return this.copiesService.create(createCopyDto);
   }
@@ -69,7 +72,7 @@ export class CopiesController {
 
   @Get(':id/availability')
   @Public()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Check copy availability including reservations',
     description: `
       Retorna información detallada sobre la disponibilidad de un ejemplar.
@@ -80,10 +83,10 @@ export class CopiesController {
       - BORROWED: Prestado actualmente
       - MAINTENANCE: En mantenimiento
       - LOST: Perdido o extraviado
-    `
+    `,
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Copy availability information',
     schema: {
       example: {
@@ -137,9 +140,10 @@ export class CopiesController {
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.LIBRARIAN)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Update copy status',
-    description: 'Change the status of a copy (available, reserved, borrowed, maintenance, lost)'
+    description:
+      'Change the status of a copy (available, reserved, borrowed, maintenance, lost)',
   })
   @ApiResponse({ status: 200, description: 'Copy status updated successfully' })
   @ApiResponse({ status: 404, description: 'Copy not found' })

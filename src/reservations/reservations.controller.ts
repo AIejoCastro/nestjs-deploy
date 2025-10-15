@@ -105,7 +105,10 @@ export class ReservationsController {
       },
     },
   })
-  create(@Request() req, @Body() createReservationDto: CreateReservationDto) {
+  create(
+    @Request() req: { user: { id: string } },
+    @Body() createReservationDto: CreateReservationDto,
+  ) {
     return this.reservationsService.create(req.user.id, createReservationDto);
   }
 
@@ -162,7 +165,7 @@ export class ReservationsController {
     status: 200,
     description: 'List of user reservations',
   })
-  findMyReservations(@Request() req) {
+  findMyReservations(@Request() req: { user: { id: string } }) {
     return this.reservationsService.findUserReservations(req.user.id);
   }
 
@@ -189,7 +192,8 @@ export class ReservationsController {
   @Roles(UserRole.ADMIN, UserRole.LIBRARIAN)
   @ApiOperation({
     summary: 'Get reservation statistics (Admin/Librarian only)',
-    description: 'Retorna estadísticas generales sobre las reservas del sistema',
+    description:
+      'Retorna estadísticas generales sobre las reservas del sistema',
   })
   @ApiResponse({
     status: 200,
@@ -309,7 +313,8 @@ export class ReservationsController {
   })
   cancelReservation(
     @Param('id', ParseUUIDPipe) id: string,
-    @Request() req,
+    @Request() req: { user: { id: string; role: UserRole } },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @Body() cancelReservationDto?: CancelReservationDto,
   ) {
     // Si el usuario no es admin/librarian, solo puede cancelar sus propias reservas
@@ -370,7 +375,10 @@ export class ReservationsController {
   @ApiResponse({ status: 204, description: 'Reservation deleted successfully' })
   @ApiResponse({ status: 400, description: 'Cannot delete reservation' })
   @ApiResponse({ status: 404, description: 'Reservation not found' })
-  deleteReservation(@Param('id', ParseUUIDPipe) id: string, @Request() req) {
+  deleteReservation(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Request() req: { user: { id: string; role: UserRole } },
+  ) {
     const isAdminOrLibrarian = [UserRole.ADMIN, UserRole.LIBRARIAN].includes(
       req.user.role,
     );

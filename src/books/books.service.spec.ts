@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -52,7 +55,11 @@ describe('BooksService', () => {
       mockRepository.create.mockReturnValue(mockBook);
       mockRepository.save.mockResolvedValue(mockBook);
 
-      const dto = { title: 'Test Book', author: 'Author', isbn: 'ISBN-123' } as any;
+      const dto = {
+        title: 'Test Book',
+        author: 'Author',
+        isbn: 'ISBN-123',
+      } as any;
       const res = await service.create(dto);
 
       expect(res).toEqual(mockBook);
@@ -62,9 +69,9 @@ describe('BooksService', () => {
     it('throws ConflictException when isbn exists', async () => {
       mockRepository.findOne.mockResolvedValue(mockBook);
 
-      await expect(service.create({ title: '', author: '', isbn: 'ISBN-123' })).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(
+        service.create({ title: '', author: '', isbn: 'ISBN-123' }),
+      ).rejects.toThrow(ConflictException);
     });
   });
 
@@ -92,7 +99,9 @@ describe('BooksService', () => {
 
     it('throws NotFoundException when missing', async () => {
       mockRepository.findOne.mockResolvedValue(null);
-      await expect(service.findOne('missing')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('missing')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -107,5 +116,4 @@ describe('BooksService', () => {
       expect(res.title).toBe('Updated');
     });
   });
-
 });

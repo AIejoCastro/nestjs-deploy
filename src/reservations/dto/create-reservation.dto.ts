@@ -18,7 +18,10 @@ export class CreateReservationDto {
     type: String,
     format: 'date-time',
   })
-  @IsDateString({}, { message: 'expirationDate must be a valid ISO 8601 date string' })
+  @IsDateString(
+    {},
+    { message: 'expirationDate must be a valid ISO 8601 date string' },
+  )
   @IsOptional()
   expirationDate?: string;
 }

@@ -81,9 +81,9 @@ export class UsersService {
   }
 
   async updateTwoFactorSecret(id: string, secret: string): Promise<void> {
-  const user = await this.findOne(id);
-  user.twoFactorSecret = secret;
-  await this.usersRepository.save(user);
+    const user = await this.findOne(id);
+    user.twoFactorSecret = secret;
+    await this.usersRepository.save(user);
   }
 
   async enableTwoFactor(id: string): Promise<void> {

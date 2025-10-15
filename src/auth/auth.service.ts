@@ -29,6 +29,7 @@ export class AuthService {
       role: UserRole.STUDENT,
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = user;
     return result;
   }
@@ -71,7 +72,9 @@ export class AuthService {
     });
 
     if (!secret.otpauth_url) {
-      throw new InternalServerErrorException('Failed to generate OTP Auth URL for 2FA');
+      throw new InternalServerErrorException(
+        'Failed to generate OTP Auth URL for 2FA',
+      );
     }
 
     const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url);

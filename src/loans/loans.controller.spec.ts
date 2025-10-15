@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { LoansController } from './loans.controller';
 import { LoansService } from './loans.service';
@@ -60,7 +62,10 @@ describe('LoansController', () => {
 
   describe('returnLoan', () => {
     it('calls service.returnLoan with id', async () => {
-      mockService.returnLoan.mockResolvedValue({ id: 'loan1', status: 'returned' });
+      mockService.returnLoan.mockResolvedValue({
+        id: 'loan1',
+        status: 'returned',
+      });
       const res = await controller.returnLoan('loan1');
       expect(mockService.returnLoan).toHaveBeenCalledWith('loan1');
       expect(res).toEqual({ id: 'loan1', status: 'returned' });

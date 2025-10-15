@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test, TestingModule } from '@nestjs/testing';
 import { GoogleBooksController } from './google-books.controller';
 import { GoogleBooksService } from './google-books.service';

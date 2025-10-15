@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
@@ -12,12 +15,18 @@ describe('Loans (e2e)', () => {
   let copyId: string;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
 
     app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api');
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
 
     await app.init();
@@ -43,7 +52,9 @@ describe('Loans (e2e)', () => {
       .send({ email: 'admin@icesi.edu.co', password: 'Admin123!' });
     adminToken = adminLogin.body.access_token;
 
-    const copies = await request(app.getHttpServer()).get('/api/copies/available').expect(200);
+    const copies = await request(app.getHttpServer())
+      .get('/api/copies/available')
+      .expect(200);
     copyId = copies.body[0].id;
   });
 
@@ -69,7 +80,9 @@ describe('Loans (e2e)', () => {
         .expect(201);
 
       // Another user tries to borrow same copy
-      const librarianLogin = await request(app.getHttpServer()).post('/api/auth/login').send({ email: 'librarian@icesi.edu.co', password: 'Librarian123!' });
+      const librarianLogin = await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .send({ email: 'librarian@icesi.edu.co', password: 'Librarian123!' });
       const librarianToken = librarianLogin.body.access_token;
 
       return request(app.getHttpServer())
@@ -81,24 +94,46 @@ describe('Loans (e2e)', () => {
 
     it('should enforce max 3 active loans per user', async () => {
       // Get three different copies
-      const copies = await request(app.getHttpServer()).get('/api/copies/available').expect(200);
+      const copies = await request(app.getHttpServer())
+        .get('/api/copies/available')
+        .expect(200);
       const c1 = copies.body[0].id;
       const c2 = copies.body[1].id;
       const c3 = copies.body[2].id;
       const c4 = copies.body[3].id;
 
-      await request(app.getHttpServer()).post('/api/loans').set('Authorization', `Bearer ${studentToken}`).send({ copyId: c1 }).expect(201);
-      await request(app.getHttpServer()).post('/api/loans').set('Authorization', `Bearer ${studentToken}`).send({ copyId: c2 }).expect(201);
-      await request(app.getHttpServer()).post('/api/loans').set('Authorization', `Bearer ${studentToken}`).send({ copyId: c3 }).expect(201);
+      await request(app.getHttpServer())
+        .post('/api/loans')
+        .set('Authorization', `Bearer ${studentToken}`)
+        .send({ copyId: c1 })
+        .expect(201);
+      await request(app.getHttpServer())
+        .post('/api/loans')
+        .set('Authorization', `Bearer ${studentToken}`)
+        .send({ copyId: c2 })
+        .expect(201);
+      await request(app.getHttpServer())
+        .post('/api/loans')
+        .set('Authorization', `Bearer ${studentToken}`)
+        .send({ copyId: c3 })
+        .expect(201);
 
       // Fourth should fail
-      return request(app.getHttpServer()).post('/api/loans').set('Authorization', `Bearer ${studentToken}`).send({ copyId: c4 }).expect(400);
+      return request(app.getHttpServer())
+        .post('/api/loans')
+        .set('Authorization', `Bearer ${studentToken}`)
+        .send({ copyId: c4 })
+        .expect(400);
     });
   });
 
   describe('/api/loans/:id/return (PATCH)', () => {
     it('should return a loan (admin)', async () => {
-      const loan = await request(app.getHttpServer()).post('/api/loans').set('Authorization', `Bearer ${studentToken}`).send({ copyId }).expect(201);
+      const loan = await request(app.getHttpServer())
+        .post('/api/loans')
+        .set('Authorization', `Bearer ${studentToken}`)
+        .send({ copyId })
+        .expect(201);
 
       const res = await request(app.getHttpServer())
         .patch(`/api/loans/${loan.body.id}/return`)
@@ -111,8 +146,15 @@ describe('Loans (e2e)', () => {
 
   describe('/api/loans (GET) admin stats', () => {
     it('should allow admin to list all loans', async () => {
-      await request(app.getHttpServer()).post('/api/loans').set('Authorization', `Bearer ${studentToken}`).send({ copyId }).expect(201);
-      const res = await request(app.getHttpServer()).get('/api/loans').set('Authorization', `Bearer ${adminToken}`).expect(200);
+      await request(app.getHttpServer())
+        .post('/api/loans')
+        .set('Authorization', `Bearer ${studentToken}`)
+        .send({ copyId })
+        .expect(201);
+      const res = await request(app.getHttpServer())
+        .get('/api/loans')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
       expect(Array.isArray(res.body)).toBe(true);
     });
   });

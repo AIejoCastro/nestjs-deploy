@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { of } from 'rxjs';
 import { GoogleBooksService } from './google-books.service';
 import { BooksService } from '../books/books.service';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException } from '@nestjs/common';
 
 describe('GoogleBooksService', () => {
   let service: GoogleBooksService;
@@ -68,7 +69,17 @@ describe('GoogleBooksService', () => {
 
   it('enrichBookData should create book when not existing', async () => {
     mockConfigService.get.mockReturnValue('KEY');
-    const googleData = { items: [{ volumeInfo: { title: 'T', authors: ['A'], imageLinks: { thumbnail: 't' } } }] };
+    const googleData = {
+      items: [
+        {
+          volumeInfo: {
+            title: 'T',
+            authors: ['A'],
+            imageLinks: { thumbnail: 't' },
+          },
+        },
+      ],
+    };
     mockHttpService.get.mockReturnValue(of({ data: googleData }));
     mockBooksService.findByIsbn.mockResolvedValue(null);
     mockBooksService.create.mockResolvedValue({ id: 'b1' });
@@ -80,7 +91,9 @@ describe('GoogleBooksService', () => {
 
   it('enrichBookData should update when book exists', async () => {
     mockConfigService.get.mockReturnValue('KEY');
-    const googleData = { items: [{ volumeInfo: { title: 'T', authors: ['A'] } }] };
+    const googleData = {
+      items: [{ volumeInfo: { title: 'T', authors: ['A'] } }],
+    };
     mockHttpService.get.mockReturnValue(of({ data: googleData }));
     mockBooksService.findByIsbn.mockResolvedValue({ id: 'b1' });
     mockBooksService.update.mockResolvedValue({ id: 'b1', title: 'T' });

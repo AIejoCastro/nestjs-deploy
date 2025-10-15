@@ -33,7 +33,10 @@ export class LoansController {
   @Post()
   @ApiOperation({ summary: 'Create a new loan' })
   @ApiResponse({ status: 201, description: 'Loan created successfully' })
-  create(@Request() req, @Body() createLoanDto: CreateLoanDto) {
+  create(
+    @Request() req: { user: { id: string } },
+    @Body() createLoanDto: CreateLoanDto,
+  ) {
     return this.loansService.create(req.user.id, createLoanDto);
   }
 
@@ -46,7 +49,7 @@ export class LoansController {
 
   @Get('my')
   @ApiOperation({ summary: 'Get current user loans' })
-  findMyLoans(@Request() req) {
+  findMyLoans(@Request() req: { user: { id: string } }) {
     return this.loansService.findUserLoans(req.user.id);
   }
 

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
@@ -96,13 +99,18 @@ describe('Books (e2e)', () => {
         author: 'Someone',
       };
 
-      return request(app.getHttpServer()).post('/api/books').send(payload).expect(401);
+      return request(app.getHttpServer())
+        .post('/api/books')
+        .send(payload)
+        .expect(401);
     });
   });
 
   describe('/api/books (GET)', () => {
     it('should return a list of books', async () => {
-      const res = await request(app.getHttpServer()).get('/api/books').expect(200);
+      const res = await request(app.getHttpServer())
+        .get('/api/books')
+        .expect(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body.length).toBeGreaterThan(0);
     });
@@ -112,19 +120,26 @@ describe('Books (e2e)', () => {
     let bookId: string;
 
     beforeEach(async () => {
-      const res = await request(app.getHttpServer()).get('/api/books').expect(200);
+      const res = await request(app.getHttpServer())
+        .get('/api/books')
+        .expect(200);
       bookId = res.body[0].id;
     });
 
     it('should get a book by id', () => {
-      return request(app.getHttpServer()).get(`/api/books/${bookId}`).expect(200).expect((res) => {
-        expect(res.body.id).toBe(bookId);
-      });
+      return request(app.getHttpServer())
+        .get(`/api/books/${bookId}`)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.id).toBe(bookId);
+        });
     });
 
     it('should return 404 for non-existent book id', () => {
       const fakeId = '123e4567-e89b-12d3-a456-426614174999';
-      return request(app.getHttpServer()).get(`/api/books/${fakeId}`).expect(404);
+      return request(app.getHttpServer())
+        .get(`/api/books/${fakeId}`)
+        .expect(404);
     });
 
     it('should update a book (admin)', () => {
@@ -161,7 +176,9 @@ describe('Books (e2e)', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
-      return request(app.getHttpServer()).get(`/api/books/${idToDelete}`).expect(404);
+      return request(app.getHttpServer())
+        .get(`/api/books/${idToDelete}`)
+        .expect(404);
     });
   });
 });

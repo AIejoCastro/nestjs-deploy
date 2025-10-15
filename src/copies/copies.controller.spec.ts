@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test, TestingModule } from '@nestjs/testing';
 import { CopiesController } from './copies.controller';
 import { CopiesService } from './copies.service';

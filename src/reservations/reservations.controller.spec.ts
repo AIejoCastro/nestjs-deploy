@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReservationsController } from './reservations.controller';
 import { ReservationsService } from './reservations.service';
@@ -50,25 +52,48 @@ describe('ReservationsController', () => {
 
   describe('cancelReservation', () => {
     it('calls cancelReservation for regular user passing user id', async () => {
-      mockService.cancelReservation.mockResolvedValue({ id: 'r1', status: ReservationStatus.CANCELLED });
+      mockService.cancelReservation.mockResolvedValue({
+        id: 'r1',
+        status: ReservationStatus.CANCELLED,
+      });
       const req = { user: { id: 'user-1', role: 'STUDENT' } } as any;
-      const res = await controller.cancelReservation('r1', req, undefined as any);
-      expect(mockService.cancelReservation).toHaveBeenCalledWith('r1', 'user-1');
+      const res = await controller.cancelReservation(
+        'r1',
+        req,
+        undefined as any,
+      );
+      expect(mockService.cancelReservation).toHaveBeenCalledWith(
+        'r1',
+        'user-1',
+      );
       expect(res.status).toBe(ReservationStatus.CANCELLED);
     });
 
     it('calls cancelReservation for admin without user filter', async () => {
-      mockService.cancelReservation.mockResolvedValue({ id: 'r2', status: ReservationStatus.CANCELLED });
+      mockService.cancelReservation.mockResolvedValue({
+        id: 'r2',
+        status: ReservationStatus.CANCELLED,
+      });
       const req = { user: { id: 'admin-1', role: 'admin' } } as any; // match enum lowercase value
-      const res = await controller.cancelReservation('r2', req, undefined as any);
-      expect(mockService.cancelReservation).toHaveBeenCalledWith('r2', undefined);
+      const res = await controller.cancelReservation(
+        'r2',
+        req,
+        undefined as any,
+      );
+      expect(mockService.cancelReservation).toHaveBeenCalledWith(
+        'r2',
+        undefined,
+      );
       expect(res.status).toBe(ReservationStatus.CANCELLED);
     });
   });
 
   describe('expireReservations', () => {
     it('calls manualExpireReservations', async () => {
-      mockService.manualExpireReservations.mockResolvedValue({ message: 'ok', expired: 2 });
+      mockService.manualExpireReservations.mockResolvedValue({
+        message: 'ok',
+        expired: 2,
+      });
       const res = await controller.expireReservations();
       expect(mockService.manualExpireReservations).toHaveBeenCalled();
       expect(res).toEqual({ message: 'ok', expired: 2 });

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
@@ -18,7 +21,11 @@ describe('Copies (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api');
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
 
     await app.init();
@@ -47,23 +54,29 @@ describe('Copies (e2e)', () => {
 
   describe('/api/copies (GET|POST)', () => {
     it('should list copies', async () => {
-      const res = await request(app.getHttpServer()).get('/api/copies').expect(200);
+      const res = await request(app.getHttpServer())
+        .get('/api/copies')
+        .expect(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body.length).toBeGreaterThan(0);
     });
 
     it('should list available copies', async () => {
-      const res = await request(app.getHttpServer()).get('/api/copies/available').expect(200);
+      const res = await request(app.getHttpServer())
+        .get('/api/copies/available')
+        .expect(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body.length).toBeGreaterThan(0);
     });
 
     it('should create a copy (librarian)', async () => {
       // get a book id to attach
-      const books = await request(app.getHttpServer()).get('/api/books').expect(200);
+      const books = await request(app.getHttpServer())
+        .get('/api/books')
+        .expect(200);
       const bookId = books.body[0].id;
 
-  const payload = { code: 'COPY-999-1', bookId, status: 'available' };
+      const payload = { code: 'COPY-999-1', bookId, status: 'available' };
 
       const res = await request(app.getHttpServer())
         .post('/api/copies')
@@ -76,7 +89,10 @@ describe('Copies (e2e)', () => {
     });
 
     it('should fail to create copy without auth', () => {
-      return request(app.getHttpServer()).post('/api/copies').send({ code: 'NO-AUTH', bookId: 'x' }).expect(401);
+      return request(app.getHttpServer())
+        .post('/api/copies')
+        .send({ code: 'NO-AUTH', bookId: 'x' })
+        .expect(401);
     });
   });
 
@@ -84,15 +100,21 @@ describe('Copies (e2e)', () => {
     let copyId: string;
 
     beforeEach(async () => {
-      const copies = await request(app.getHttpServer()).get('/api/copies').expect(200);
+      const copies = await request(app.getHttpServer())
+        .get('/api/copies')
+        .expect(200);
       copyId = copies.body[0].id;
     });
 
     it('should get copy by id and check availability endpoint', async () => {
-      const res = await request(app.getHttpServer()).get(`/api/copies/${copyId}`).expect(200);
+      const res = await request(app.getHttpServer())
+        .get(`/api/copies/${copyId}`)
+        .expect(200);
       expect(res.body.id).toBe(copyId);
 
-      const avail = await request(app.getHttpServer()).get(`/api/copies/${copyId}/availability`).expect(200);
+      const avail = await request(app.getHttpServer())
+        .get(`/api/copies/${copyId}/availability`)
+        .expect(200);
       expect(avail.body).toHaveProperty('copyId', copyId);
       expect(avail.body).toHaveProperty('isAvailable');
     });
@@ -122,7 +144,9 @@ describe('Copies (e2e)', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
-      return request(app.getHttpServer()).get(`/api/copies/${copyId}`).expect(404);
+      return request(app.getHttpServer())
+        .get(`/api/copies/${copyId}`)
+        .expect(404);
     });
   });
 });

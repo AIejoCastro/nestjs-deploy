@@ -7,11 +7,7 @@ import { CopiesModule } from '../copies/copies.module';
 import { ReservationsModule } from '../reservations/reservations.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Loan]),
-    CopiesModule,
-    ReservationsModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Loan]), CopiesModule, ReservationsModule],
   controllers: [LoansController],
   providers: [LoansService],
   exports: [LoansService],

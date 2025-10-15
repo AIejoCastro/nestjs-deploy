@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -92,8 +94,8 @@ describe('ReservationsService', () => {
       mockCopiesService.findOne.mockResolvedValue(mockCopy);
       mockRepository.count.mockResolvedValue(0);
       mockRepository.findOne.mockResolvedValue(null);
-  mockRepository.create.mockReturnValue({ ...mockReservation });
-  mockRepository.save.mockResolvedValue({ ...mockReservation });
+      mockRepository.create.mockReturnValue({ ...mockReservation });
+      mockRepository.save.mockResolvedValue({ ...mockReservation });
       mockCopiesService.updateStatus.mockResolvedValue(mockCopy);
 
       const result = await service.create('user-1', createReservationDto);
@@ -128,7 +130,7 @@ describe('ReservationsService', () => {
     it('should throw ConflictException if copy already reserved', async () => {
       mockCopiesService.findOne.mockResolvedValue(mockCopy);
       mockRepository.count.mockResolvedValue(0);
-  mockRepository.findOne.mockResolvedValue({ ...mockReservation });
+      mockRepository.findOne.mockResolvedValue({ ...mockReservation });
 
       await expect(
         service.create('user-1', createReservationDto),
@@ -138,7 +140,7 @@ describe('ReservationsService', () => {
 
   describe('findOne', () => {
     it('should return a reservation by id', async () => {
-  mockRepository.findOne.mockResolvedValue({ ...mockReservation });
+      mockRepository.findOne.mockResolvedValue({ ...mockReservation });
 
       const result = await service.findOne('reservation-1');
 
@@ -156,7 +158,7 @@ describe('ReservationsService', () => {
 
   describe('cancelReservation', () => {
     it('should cancel a reservation', async () => {
-  mockRepository.findOne.mockResolvedValue({ ...mockReservation });
+      mockRepository.findOne.mockResolvedValue({ ...mockReservation });
       mockRepository.save.mockResolvedValue({
         ...mockReservation,
         status: ReservationStatus.CANCELLED,
@@ -173,7 +175,7 @@ describe('ReservationsService', () => {
     });
 
     it('should throw BadRequestException if not user reservation', async () => {
-  mockRepository.findOne.mockResolvedValue({ ...mockReservation });
+      mockRepository.findOne.mockResolvedValue({ ...mockReservation });
 
       await expect(
         service.cancelReservation('reservation-1', 'other-user'),
@@ -226,13 +228,19 @@ describe('ReservationsService', () => {
     });
 
     it('should delete reservation even if not pending', async () => {
-      mockRepository.findOne.mockResolvedValue({ ...mockReservation, status: ReservationStatus.CANCELLED });
+      mockRepository.findOne.mockResolvedValue({
+        ...mockReservation,
+        status: ReservationStatus.CANCELLED,
+      });
       mockRepository.delete = jest.fn().mockResolvedValue(undefined);
       mockCopiesService.updateStatus.mockResolvedValue(mockCopy);
 
       await service.remove('reservation-1', 'user-1');
 
-      expect(mockCopiesService.updateStatus).toHaveBeenCalledWith('copy-1', CopyStatus.AVAILABLE);
+      expect(mockCopiesService.updateStatus).toHaveBeenCalledWith(
+        'copy-1',
+        CopyStatus.AVAILABLE,
+      );
       expect(mockRepository.delete).toHaveBeenCalledWith('reservation-1');
     });
 
@@ -243,7 +251,10 @@ describe('ReservationsService', () => {
 
       await service.remove('reservation-1');
 
-      expect(mockCopiesService.updateStatus).toHaveBeenCalledWith('copy-1', CopyStatus.AVAILABLE);
+      expect(mockCopiesService.updateStatus).toHaveBeenCalledWith(
+        'copy-1',
+        CopyStatus.AVAILABLE,
+      );
       expect(mockRepository.delete).toHaveBeenCalledWith('reservation-1');
     });
   });

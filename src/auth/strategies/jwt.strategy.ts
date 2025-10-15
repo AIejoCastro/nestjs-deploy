@@ -10,7 +10,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private configService: ConfigService,
     private usersService: UsersService,
   ) {
-    const jwtSecret = configService.get<string>('JWT_SECRET') || 'dev_jwt_secret';
+    const jwtSecret =
+      configService.get<string>('JWT_SECRET') || 'dev_jwt_secret';
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -18,9 +19,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any) {
+  async validate(payload: { sub: string }) {
     const user = await this.usersService.findOne(payload.sub);
-    
+
     if (!user || !user.isActive) {
       throw new UnauthorizedException();
     }
