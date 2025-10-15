@@ -1,0 +1,58 @@
+# Render Blueprint - Infrastructure as Code
+# Este archivo define todos los servicios de tu aplicación en Render
+# Documentación: https://render.com/docs/blueprint-spec
+
+services:
+  # Servicio Web - API NestJS
+  - type: web
+    name: biblioicesi-api
+    runtime: docker
+    region: oregon # o 'frankfurt', 'singapore' según tu ubicación
+    plan: free # Opciones: free, starter, standard, pro
+    branch: main
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DB_HOST
+        fromDatabase:
+          name: biblioicesi-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: biblioicesi-db
+          property: port
+      - key: DB_USERNAME
+        fromDatabase:
+          name: biblioicesi-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: biblioicesi-db
+          property: password
+      - key: DB_DATABASE
+        fromDatabase:
+          name: biblioicesi-db
+          property: database
+      - key: DB_SYNCHRONIZE
+        value: false # IMPORTANTE: usar migrations en producción
+      - key: JWT_SECRET
+        generateValue: true # Render generará un secreto aleatorio seguro
+      - key: JWT_EXPIRES_IN
+        value: 7d
+    healthCheckPath: /
+    autoDeploy: true
+
+# Base de datos PostgreSQL
+databases:
+  - name: biblioicesi-db
+    databaseName: biblioicesi
+    region: oregon # Debe coincidir con el region del servicio web
+    plan: free # Opciones: free, starter, standard, pro
+    # El plan free incluye:
+    # - 256 MB RAM
+    # - 1 GB almacenamiento
+    # - Expira después de 90 días (requiere upgrade)
+    postgresMajorVersion: 15
